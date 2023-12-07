@@ -869,6 +869,9 @@ class Update(_ProjectCommand):
     def do_add_parser(self, parser_adder):
         parser = self._parser(parser_adder)
 
+        parser.add_argument('--dump_proj', type=int, default=0,
+                            help='''Dump project data upon the first uncloned project stopping with the specified exit status''')
+
         parser.add_argument('--stats', action='store_true',
                             help='''print performance statistics for
                             update operations''')
@@ -1290,6 +1293,9 @@ class Update(_ProjectCommand):
         if take_stats:
             stats['check if cloned'] = perf_counter() - start
         if not cloned:
+            if self.args.dump_proj is not 0:
+                import json
+                self.die(json.dumps(project.__dict__), self.args.dump_proj)
             if take_stats:
                 start = perf_counter()
             self.init_project(project)
